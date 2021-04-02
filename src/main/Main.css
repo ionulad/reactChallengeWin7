@@ -1,0 +1,6 @@
+.Main-Header {
+  text-align: center;
+  background-color: #333333;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
