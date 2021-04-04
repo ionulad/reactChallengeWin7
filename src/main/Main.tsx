@@ -277,8 +277,7 @@ const Main: () => JSX.Element = () => {
             } else if ((!t1.wind || !t1.wind?.speed) && t2.wind && t2.wind?.speed) {
                 return -1;
             } else if (t1.wind && t1.wind.speed && t2.wind && t2.wind.speed) {
-                let number = t1.wind.speed - t2.wind.speed;
-                return number;
+                return t1.wind.speed - t2.wind.speed;
             }
             return 0;
         }));
@@ -297,8 +296,7 @@ const Main: () => JSX.Element = () => {
             } else if ((!t1.wind || !t1.wind?.speed) && t2.wind && t2.wind?.speed) {
                 return 1;
             } else if (t1.wind && t1.wind.speed && t2.wind && t2.wind.speed) {
-                let number = t2.wind.speed - t1.wind.speed;
-                return number;
+                return t2.wind.speed - t1.wind.speed;
             }
             return 0;
         }));
@@ -313,14 +311,14 @@ const Main: () => JSX.Element = () => {
     function addToFavorites(data: IWeatherData) {
         // TODO actually move the element between the two lists
         setTowns(towns.filter((value) => {
-            return value.id != data.id;
+            return value.id !== data.id;
         }));
         setFavorites(favorites => [...favorites, data]);
     }
 
     function removeFromFavorites(data: IWeatherData) {
         setFavorites(favorites.filter((value) => {
-            return value.id != data.id;
+            return value.id !== data.id;
         }));
         // TODO actually move the element between the two lists
         setTowns(towns => [...towns, data]);
