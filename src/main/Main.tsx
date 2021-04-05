@@ -249,13 +249,20 @@ const Main: () => JSX.Element = () => {
                 console.log("loaded favorites data from cache!");
             } else if (favorites.length >= 1) {
                 let newFavorites: IWeatherData[] = [];
-                favorites.forEach(favorite => {
+                for (const favorite of favorites) {
                     if (favorite.id != null) {
-                        loadDataForCity(favorite.id, newFavorites);
+                        let promise = Promise.all([loadDataForCity(favorite.id)]);
+                        promise.then(result => {
+                            result.forEach(element => {
+                                if (element) {
+                                    newFavorites = [...newFavorites, element];
+                                    favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+                                    setFavorites(newFavorites);
+                                }
+                            })
+                        })
                     }
-                });
-                favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
-                setFavorites(newFavorites);
+                }
             }
         });
     }
@@ -273,8 +280,8 @@ const Main: () => JSX.Element = () => {
         });
     }
 
-    function loadDataForCity(cityId: number, newFavorites: IWeatherData[]) {
-        axios
+    function loadDataForCity(cityId: number): Promise<void | IWeatherData> {
+        return axios
             .get<IWeatherData>('http://api.openweathermap.org/data/2.5/weather?id=' + cityId + '&appid=daade2050956b8fb98dc00de7917f6a4', {
                 cancelToken: cancelTokenSource.token,
                 headers: {
@@ -283,8 +290,8 @@ const Main: () => JSX.Element = () => {
                 timeout: 5000,
             })
             .then((response) => {
-                newFavorites = [...newFavorites, response.data];
                 setLoading(false);
+                return response.data;
             })
             .catch((ex) => {
                 const err = axios.isCancel(ex)
