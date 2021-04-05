@@ -232,7 +232,7 @@ const Main: () => JSX.Element = () => {
                 newTowns = [...newTowns, value];
             }
         });
-        townCache.setItem("towns", newTowns, {ttl: 6 * 60}).then(r => console.log("cached data!"));
+        townCache.setItem("towns", newTowns, {ttl: 6 * 60}).then(() => console.log("cached data!"));
         setTowns(newTowns);
     }
 
@@ -258,7 +258,7 @@ const Main: () => JSX.Element = () => {
                                     newFavorites = [...newFavorites, element];
                                 }
                             })
-                            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+                            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
                             setFavorites(newFavorites);
                         })
                     }
@@ -414,7 +414,7 @@ const Main: () => JSX.Element = () => {
         if (!favorites.find(x => x.id === data.id)) {
             let newFavorites: IWeatherData[] = [...favorites, data];
             localStorage.setItem("favorites", JSON.stringify(newFavorites));
-            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
             setFavorites(newFavorites);
 
             // setTowns([...towns].filter((value) => {
@@ -429,7 +429,7 @@ const Main: () => JSX.Element = () => {
                 return value.id !== data.id;
             });
             localStorage.setItem("favorites", JSON.stringify(filtered ? filtered : defaultFavorite));
-            favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(r => console.log("cached favorites data!"));
+            favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(() => console.log("cached favorites data!"));
             setFavorites(filtered);
 
             // setTowns(towns => [...towns, data]);
