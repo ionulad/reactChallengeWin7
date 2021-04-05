@@ -1,50 +1,25 @@
-import React from 'react';
-import {render, screen} from '@testing-library/react';
-import Town from './Town';
-import IWeatherData from "../model/IWeatherData";
+import {getWindDirection} from './Town';
 
-const defaultWeatherData: IWeatherData = {
-    id: 681290,
-    name: "Cluj-Napoca",
-    coord: {
-        lat: 46.7667,
-        lon: 23.6
-    },
-    main: {
-        temp: 283.15,
-        feels_like: 276.61,
-        temp_min: 283.15,
-        temp_max: 283.15,
-        pressure: 1029,
-        humidity: 53
-    },
-    dt: 1616936949,
-    wind: {
-        speed: 6.69,
-        deg: 310
-    },
-    sys: {
-        country: "RO"
-    },
-    clouds: {
-        all: 40
-    },
-    weather: [
-        {
-            id: 802,
-            main: "Clouds",
-            description: "scattered clouds",
-            icon: "03d"
-        }
-    ]
-};
 
-function addToFavorites(data: IWeatherData) {
-
-}
-
-test('renders scattered clouds row', () => {
-    render(<Town weatherData={defaultWeatherData} addToFavorites={() => addToFavorites(defaultWeatherData)}/>);
-    const linkElement = screen.getByText(/scattered clouds/i);
-    expect(linkElement).toBeInTheDocument();
+describe('Testing Town class methods :', () => {
+    describe('getting North wind direction', () => {
+        it('properly get the N wind direction', () => {
+            expect(getWindDirection(350)).toBe("N");
+        });
+    });
+    describe('getting South wind direction', () => {
+        it('properly get the s wind direction', () => {
+            expect(getWindDirection(180)).toBe("S");
+        });
+    });
+    describe('getting East wind direction', () => {
+        it('properly get the E wind direction', () => {
+            expect(getWindDirection(90)).toBe("E");
+        });
+    });
+    describe('getting West wind direction', () => {
+        it('properly get the W wind direction', () => {
+            expect(getWindDirection(280)).toBe("W");
+        });
+    });
 });

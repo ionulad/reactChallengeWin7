@@ -47,11 +47,60 @@ interface IWeatherDataWrapper {
     addToFavorites(data: IWeatherData): any;
 }
 
-const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (weatherDataWrapper: IWeatherDataWrapper) => {
+export function convertKelvinToCelsius(kelvinDegrees: number | undefined) {
+    if (!kelvinDegrees) {
+        return 0;
+    }
+    let celsiusDegrees = kelvinDegrees - 273.15;
+    return celsiusDegrees.toPrecision(2);
+}
+
+export function getWindDirection(d: number | undefined) {
+    if (!d) {
+        return "no direction"
+    }
+    if (d > 348.75 || d < 11.25)
+        return "N";
+    if (d > 11.25 && d < 33.75)
+        return "NNE";
+    if (d > 33.75 && d < 56.25)
+        return "NE";
+    if (d > 56.25 && d < 78.75)
+        return "ENE";
+    if (d > 78.75 && d < 101.25)
+        return "E";
+    if (d > 101.25 && d < 123.75)
+        return "ESE";
+    if (d > 123.75 && d < 146.25)
+        return "SE";
+    if (d > 146.25 && d < 168.75)
+        return "SSE";
+    if (d > 168.75 && d < 191.25)
+        return "S";
+    if (d > 191.25 && d < 213.75)
+        return "SSW";
+    if (d > 213.75 && d < 236.25)
+        return "SW";
+    if (d > 236.25 && d < 258.75)
+        return "WSW";
+    if (d > 258.75 && d < 281.25)
+        return "W";
+    if (d > 281.25 && d < 303.75)
+        return "WNW";
+    if (d > 303.75 && d < 326.25)
+        return "NW";
+    if (d > 326.25 && d < 348.75)
+        return "NNW";
+
+    return "no direction"
+}
+
+export const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (weatherDataWrapper: IWeatherDataWrapper) => {
     const [weatherData]: [
         IWeatherData,
         (weatherInformation: IWeatherData) => void
     ] = React.useState<IWeatherData>(weatherDataWrapper ? weatherDataWrapper.weatherData : defaultWeatherData)
+
 
     return (
         <div className="Town">
@@ -60,7 +109,7 @@ const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (weatherD
                                                                           onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
             </Divider>
             {weatherData.weather.map((weather) => (
-                <div>
+                <div key={weather.id}>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                         <Col className="gutter-row" flex={"auto"}>
                             <div>
@@ -69,7 +118,10 @@ const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (weatherD
                             </div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Temperature: {weatherData.main?.temp}&#8451;</div>
+                            <div>Temperature: {convertKelvinToCelsius(weatherData.main?.temp)}&#8451;</div>
+                        </Col>
+                        <Col className="gutter-row" flex={"auto"}>
+                            <div>Coordinates: {weatherData.coord?.lat} : {weatherData.coord?.lon}</div>
                         </Col>
                     </Row>
 
@@ -84,7 +136,7 @@ const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (weatherD
                             <div>Wind Speed: {weatherData.wind?.speed} m/s</div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Wind direction: {weatherData.wind?.deg} degrees</div>
+                            <div>Wind direction: {getWindDirection(weatherData.wind?.deg)}</div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
                             <div>Cloud coverage: {weatherData.clouds?.all} %</div>

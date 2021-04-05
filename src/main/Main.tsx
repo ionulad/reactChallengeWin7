@@ -1,4 +1,4 @@
-import React, {useReducer} from 'react';
+import React from 'react';
 import './Main.css';
 import {Alert, Button, Col, Divider, Dropdown, Layout, Menu, Row} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
@@ -6,6 +6,8 @@ import Town from "../town/Town";
 import IWeatherMessage from '../model/IWeatherMessage';
 import axios, {CancelTokenSource} from "axios";
 import IWeatherData from "../model/IWeatherData";
+import {CacheContainer} from 'node-ts-cache'
+import {MemoryStorage} from 'node-ts-cache-storage-memory'
 
 const {Header, Footer, Content} = Layout;
 
@@ -188,19 +190,25 @@ const defaultWeatherMessage: IWeatherMessage = {
     }]
 };
 
+const townCache = new CacheContainer(new MemoryStorage());
+const favoritesCache = new CacheContainer(new MemoryStorage());
+
 const Main: () => JSX.Element = () => {
 
-    const [lat, setLat] = React.useState(46.78)
-    const [lon, setLon] = React.useState(23.54)
+    const [lat, setLat] = React.useState(23.54);
+    const [lon, setLon] = React.useState(46.78);
 
-    const [favorites, setFavorites] = React.useState(defaultFavorite)
+    const [moveLat, setMoveLat] = React.useState(lat);
+    const [moveLon, setMoveLon] = React.useState(lon);
 
-    const [towns, setTowns] = React.useState(defaultWeatherMessage.list);
+    const [quantity] = React.useState(50);
 
-    const [weatherData, setWeatherData]: [
-        IWeatherMessage,
-        (townName: IWeatherMessage) => void
-    ] = React.useState<IWeatherMessage>(defaultWeatherMessage)
+    const [favorites, setFavorites] = React.useState(() => {
+        let parsed = JSON.parse(localStorage.getItem('favorites') as string) as IWeatherData[];
+        return parsed ? parsed : defaultFavorite;
+    })
+
+    const [towns, setTowns] = React.useState(defaultFavorite);
 
     const [loading, setLoading]: [
         boolean,
@@ -218,60 +226,114 @@ const Main: () => JSX.Element = () => {
     ] = React.useState(cancelToken.source());
 
     function addMoreDataToTownsList(data: IWeatherMessage) {
-        setWeatherData(data);
-        weatherData.list.forEach(value => setTowns(towns => [...towns, value]));
+        let newTowns = [...towns];
+        data.list.forEach(value => {
+            if (!towns.find(v => v.id === value.id)) {
+                newTowns = [...newTowns, value];
+            }
+        });
+        townCache.setItem("towns", newTowns, {ttl: 6 * 60}).then(r => console.log("cached data!"));
+        setTowns(newTowns);
     }
 
-    // initial loading of data
     React.useEffect(() => {
-        loadMoreData(lat, lon);
-    }, [lat, lon]);
+        // TODO load data for city imi da 404 desi daca accesez linkul in browser functioneaza
+        loadFavoritesData();
+        loadData();
+    }, [lat, lon, quantity]);
 
-    function loadMoreData(lon: number, lat: number) {
-        // TODO welp i'm timed out again
-        // axios
-        //     .get<IWeatherMessage>('http://api.openweathermap.org/data/2.5/find?lat=' + lat + '&lon=' + lon + '&cnt=10&appid=?', {
-        //         cancelToken: cancelTokenSource.token,
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         timeout: 5000,
-        //     })
-        //     .then((response) => {
-        //         addMoreDataToTownsList(response.data);
-        //         setLoading(false);
-        //     })
-        //     .catch((ex) => {
-        //         const err = axios.isCancel(ex)
-        //             ? 'Request cancelled'
-        //             : ex.code === 'ECONNABORTED'
-        //                 ? 'A timeout has occurred'
-        //                 : ex.response.status === 404
-        //                     ? 'No Data found with these coordinates'
-        //                     : ex.response.data.message;
-        //         setError(err);
-        //         setLoading(false);
-        //     });
+    function loadFavoritesData() {
+        const cachedFavorites = favoritesCache.getItem<IWeatherData[]>("favorites");
+        cachedFavorites.then((result) => {
+            if (result) {
+                setFavorites([...result]);
+                console.log("loaded favorites data from cache!");
+            } else if (favorites.length >= 1) {
+                let newFavorites: IWeatherData[] = [];
+                favorites.forEach(favorite => {
+                    if (favorite.id != null) {
+                        loadDataForCity(favorite.id, newFavorites);
+                    }
+                });
+                favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+                setFavorites(newFavorites);
+            }
+        });
+    }
+
+    function loadData() {
+        loadCurrentLocationData();
+        const cachedTowns = townCache.getItem<IWeatherData[]>("towns");
+        cachedTowns.then((result) => {
+            if (result) {
+                setTowns([...result]);
+                console.log("loaded data from cache!")
+            } else {
+                loadMoreData(lat, lon, quantity);
+            }
+        });
+    }
+
+    function loadDataForCity(cityId: number, newFavorites: IWeatherData[]) {
+        axios
+            .get<IWeatherData>('api.openweathermap.org/data/2.5/weather?id=' + cityId + '&appid=daade2050956b8fb98dc00de7917f6a4', {
+                cancelToken: cancelTokenSource.token,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 5000,
+            })
+            .then((response) => {
+                newFavorites = [...newFavorites, response.data];
+                setLoading(false);
+            })
+            .catch((ex) => {
+                const err = axios.isCancel(ex)
+                    ? 'Request cancelled'
+                    : ex.code === 'ECONNABORTED'
+                        ? 'A timeout has occurred'
+                        : ex.response.status === 404
+                            ? 'No Data found for this city'
+                            : ex.response.data.message;
+                setError(err);
+                setLoading(false);
+            });
+    }
+
+    function loadMoreData(lon: number, lat: number, cnt: number) {
+        axios
+            .get<IWeatherMessage>('http://api.openweathermap.org/data/2.5/find?lat=' + lat + '&lon=' + lon + '&cnt=' + cnt + '&appid=daade2050956b8fb98dc00de7917f6a4', {
+                cancelToken: cancelTokenSource.token,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 5000,
+            })
+            .then((response) => {
+                addMoreDataToTownsList(response.data);
+                setLoading(false);
+            })
+            .catch((ex) => {
+                const err = axios.isCancel(ex)
+                    ? 'Request cancelled'
+                    : ex.code === 'ECONNABORTED'
+                        ? 'A timeout has occurred'
+                        : ex.response.status === 404
+                            ? 'No Data found with these coordinates'
+                            : ex.response.data.message;
+                setError(err);
+                setLoading(false);
+            });
     }
 
     function loadMoreDataOnButtonClick() {
-        // TODO welp, i'm timed out again
-        addMoreDataToTownsList(defaultWeatherMessage);
-
-        // load more data
-        // setLat(lat + 10);
-        // setLon(lon + 10);
-        // loadMoreData(lat, lon);
+        setMoveLat(moveLat + 1);
+        setMoveLon(moveLon + 1)
+        loadMoreData(moveLat, moveLon, quantity);
     }
 
-    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
-
     function sortByLeastWindyTowns() {
-        console.log("before least windy sort");
-        towns.forEach(value => {
-            console.log(value.wind?.speed)
-        })
-        setTowns(towns.sort((t1, t2) => {
+        setTowns([...towns].sort((t1, t2) => {
             if (t1.wind && t1.wind?.speed && (!t2.wind || !t2.wind?.speed)) {
                 return 1;
             } else if ((!t1.wind || !t1.wind?.speed) && t2.wind && t2.wind?.speed) {
@@ -281,16 +343,10 @@ const Main: () => JSX.Element = () => {
             }
             return 0;
         }));
-        console.log("after least windy sort");
-        forceUpdate();
     }
 
     function sortByMostWindyTowns() {
-        console.log("before most windy sort");
-        towns.forEach(value => {
-            console.log(value.wind?.speed)
-        })
-        setTowns(towns.sort((t1, t2) => {
+        setTowns([...towns].sort((t1, t2) => {
             if (t1.wind && t1.wind?.speed && (!t2.wind || !t2.wind?.speed)) {
                 return -1;
             } else if ((!t1.wind || !t1.wind?.speed) && t2.wind && t2.wind?.speed) {
@@ -300,28 +356,76 @@ const Main: () => JSX.Element = () => {
             }
             return 0;
         }));
-        console.log("after  most windy sort");
-        forceUpdate();
     }
 
     function sortByClosestTowns() {
-        // TODO
+        setTowns([...towns].sort((t1, t2) => {
+            if (t1.coord && t1.coord?.lat && t1.coord?.lon && (!t2.coord || !t2.coord?.lat || !t2.coord?.lon)) {
+                return -1;
+            } else if ((!t1.coord || !t1.coord?.lat || !t1.coord?.lon) && t2.coord && t2.coord?.lat && t2.coord?.lon) {
+                return 1;
+            } else if (t1.coord && t1.coord?.lat && t1.coord?.lon && t2.coord && t2.coord?.lat && t2.coord?.lon) {
+                return getDistanceFromLatLonInKm(lon, lat, t1.coord?.lat, t1.coord?.lon)
+                    - getDistanceFromLatLonInKm(lon, lat, t2.coord?.lat, t2.coord?.lon);
+            }
+            return 0;
+        }));
+    }
+
+    function loadCurrentLocationData() {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const crd = pos.coords;
+            setLon(crd.latitude);
+            setLat(crd.longitude);
+        }, (err) => {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        });
+    }
+
+    // from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+    function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        let R = 6371; // Radius of the earth in km
+        let dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        let dLon = deg2rad(lon2 - lon1);
+        let a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;// Distance in km
+    }
+
+    function deg2rad(deg: number) {
+        return deg * (Math.PI / 180)
     }
 
     function addToFavorites(data: IWeatherData) {
-        // TODO actually move the element between the two lists
-        setTowns(towns.filter((value) => {
-            return value.id !== data.id;
-        }));
-        setFavorites(favorites => [...favorites, data]);
+        if (!favorites.find(x => x.id === data.id)) {
+            let newFavorites: IWeatherData[] = [...favorites, data];
+            localStorage.setItem("favorites", JSON.stringify(newFavorites));
+            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+            setFavorites(newFavorites);
+
+            // setTowns([...towns].filter((value) => {
+            //     return value.id !== data.id;
+            // }));
+        }
     }
 
     function removeFromFavorites(data: IWeatherData) {
-        setFavorites(favorites.filter((value) => {
+        let filtered: IWeatherData[] = [...favorites].filter((value) => {
             return value.id !== data.id;
-        }));
-        // TODO actually move the element between the two lists
-        setTowns(towns => [...towns, data]);
+        });
+        localStorage.setItem("favorites", JSON.stringify(filtered ? filtered : defaultFavorite));
+        favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(r => console.log("cached favorites data!"));
+        setFavorites(filtered);
+
+        // setTowns(towns => [...towns, data]);
     }
 
     const menu = (
@@ -352,7 +456,8 @@ const Main: () => JSX.Element = () => {
             <Content>
                 <Divider>Favorites List</Divider>
                 {favorites.map((weatherFavorite) => (
-                        <Town weatherData={weatherFavorite} addToFavorites={() => removeFromFavorites(weatherFavorite)}/>
+                        <Town key={weatherFavorite.id} weatherData={weatherFavorite}
+                              addToFavorites={() => removeFromFavorites(weatherFavorite)}/>
                     )
                 )}
                 <Divider>Towns List</Divider>
@@ -364,7 +469,8 @@ const Main: () => JSX.Element = () => {
                     </Dropdown>
                 </Row>
                 {towns.map((townWeather) => (
-                        <Town weatherData={townWeather} addToFavorites={() => addToFavorites(townWeather)}/>
+                        <Town key={townWeather.id} weatherData={townWeather}
+                              addToFavorites={() => addToFavorites(townWeather)}/>
                     )
                 )}
                 {error &&
@@ -382,6 +488,11 @@ const Main: () => JSX.Element = () => {
                 </Row>
             </Content>
             <Footer>
+                <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
+                    <div>
+                        Total Entries: {towns.length}
+                    </div>
+                </Row>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Button type="primary" onClick={() => loadMoreDataOnButtonClick()}>
                         Load More Data
