@@ -256,10 +256,10 @@ const Main: () => JSX.Element = () => {
                             result.forEach(element => {
                                 if (element) {
                                     newFavorites = [...newFavorites, element];
-                                    favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
-                                    setFavorites(newFavorites);
                                 }
                             })
+                            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(r => console.log("cached favorites data!"));
+                            setFavorites(newFavorites);
                         })
                     }
                 }
