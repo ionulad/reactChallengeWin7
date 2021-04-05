@@ -237,7 +237,6 @@ const Main: () => JSX.Element = () => {
     }
 
     React.useEffect(() => {
-        // TODO load data for city imi da 404 desi daca accesez linkul in browser functioneaza
         loadFavoritesData();
         loadData();
     }, [lat, lon, quantity]);
@@ -276,7 +275,7 @@ const Main: () => JSX.Element = () => {
 
     function loadDataForCity(cityId: number, newFavorites: IWeatherData[]) {
         axios
-            .get<IWeatherData>('api.openweathermap.org/data/2.5/weather?id=' + cityId + '&appid=daade2050956b8fb98dc00de7917f6a4', {
+            .get<IWeatherData>('http://api.openweathermap.org/data/2.5/weather?id=' + cityId + '&appid=daade2050956b8fb98dc00de7917f6a4', {
                 cancelToken: cancelTokenSource.token,
                 headers: {
                     'Content-Type': 'application/json',
@@ -418,14 +417,17 @@ const Main: () => JSX.Element = () => {
     }
 
     function removeFromFavorites(data: IWeatherData) {
-        let filtered: IWeatherData[] = [...favorites].filter((value) => {
-            return value.id !== data.id;
-        });
-        localStorage.setItem("favorites", JSON.stringify(filtered ? filtered : defaultFavorite));
-        favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(r => console.log("cached favorites data!"));
-        setFavorites(filtered);
+        if (window.confirm('Are you sure you want to remove this city from the favorites list?')) {
+            let filtered: IWeatherData[] = [...favorites].filter((value) => {
+                return value.id !== data.id;
+            });
+            localStorage.setItem("favorites", JSON.stringify(filtered ? filtered : defaultFavorite));
+            favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(r => console.log("cached favorites data!"));
+            setFavorites(filtered);
 
-        // setTowns(towns => [...towns, data]);
+            // setTowns(towns => [...towns, data]);
+        }
+
     }
 
     const menu = (
