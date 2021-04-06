@@ -119,7 +119,7 @@ export const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (w
                 <div className="Town-body" key={weather.id}>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                         <div>
-                            <Image className="Town-image"
+                            <Image className="Town-image" preview={false}
                                    src={'http://openweathermap.org/img/wn/' + weather.icon + '@2x.png'}/>
                         </div>
                         &nbsp;&nbsp;
