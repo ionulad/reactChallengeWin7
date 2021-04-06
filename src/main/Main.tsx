@@ -1,5 +1,5 @@
 import React from 'react';
-import './Main.css';
+import '../styles/Main.css';
 import {Alert, Button, Col, Divider, Dropdown, Layout, Menu, Row} from 'antd';
 import {DownOutlined} from '@ant-design/icons';
 import Town from "../town/Town";
@@ -455,20 +455,21 @@ const Main: () => JSX.Element = () => {
 
     return (
         <Layout>
-            <Header className="Main-Header" style={headingStyle}>Weather App</Header>
+            <Header className="Main-header" style={headingStyle}>Weather App</Header>
             <Content>
-                <Divider>Favorites List</Divider>
+                {favorites.length > 0 &&
+                <Divider className={"Divider"} dashed={true}><h1>Favorites</h1></Divider>}
                 {favorites.map((weatherFavorite) => (
                         <Town key={weatherFavorite.id} weatherData={weatherFavorite}
                               addToFavorites={() => removeFromFavorites(weatherFavorite)}/>
                     )
                 )}
-                <Divider>Towns List</Divider>
+                <Divider className={"Divider"} dashed={true}><h1>Towns</h1></Divider>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Dropdown overlay={menu}>
-                        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                        <button className="ant-dropdown-link" onClick={e => e.preventDefault()}>
                             Sort By <DownOutlined/>
-                        </a>
+                        </button>
                     </Dropdown>
                 </Row>
                 {towns.map((townWeather) => (
@@ -476,6 +477,7 @@ const Main: () => JSX.Element = () => {
                               addToFavorites={() => addToFavorites(townWeather)}/>
                     )
                 )}
+                <Divider/>
                 {error &&
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Col className="gutter-row" flex={"auto"}>
@@ -484,17 +486,17 @@ const Main: () => JSX.Element = () => {
                 </Row>}
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Dropdown overlay={menu}>
-                        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                        <button className="ant-dropdown-link" onClick={e => e.preventDefault()}>
                             Sort By <DownOutlined/>
-                        </a>
+                        </button>
                     </Dropdown>
                 </Row>
             </Content>
             <Footer>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
-                    <div>
-                        Total Entries: {towns.length}
-                    </div>
+                    <h1>
+                       Towns loaded: {towns.length}
+                    </h1>
                 </Row>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Button type="primary" onClick={() => loadMoreDataOnButtonClick()}>

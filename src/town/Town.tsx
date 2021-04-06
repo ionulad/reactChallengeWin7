@@ -1,5 +1,5 @@
 import React from 'react';
-import './Town.css';
+import '../styles/Town.css';
 import IWeatherData from '../model/IWeatherData';
 import {Col, Divider, Image, Row} from "antd";
 import 'antd/dist/antd.css';
@@ -104,45 +104,57 @@ export const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (w
 
     return (
         <div className="Town">
-
-            <Divider orientation="center">{weatherData.name} <StarTwoTone twoToneColor="#664422"
-                                                                          onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
+            <Divider className="Town-title" orientation="center">
+                {weatherData.name}&nbsp;
+                <StarTwoTone twoToneColor="#b0290b" onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
             </Divider>
             {weatherData.weather.map((weather) => (
-                <div key={weather.id}>
+                <div className="Town-body" key={weather.id}>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
+                        <Col className="gutter-row" flex={"auto"}>
+                        </Col>
+                        <Col className="gutter-row" flex={"auto"}>
+                        </Col>
                         <Col className="gutter-row" flex={"auto"}>
                             <div>
                                 <Image className="Town-image"
                                        src={'http://openweathermap.org/img/wn/' + weather.icon + '@2x.png'}/>
                             </div>
+                            <div><h1>{convertKelvinToCelsius(weatherData.main?.temp)}&#8451;</h1></div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Temperature: {convertKelvinToCelsius(weatherData.main?.temp)}&#8451;</div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Coordinates: {weatherData.coord?.lat} : {weatherData.coord?.lon}</div>
                         </Col>
                     </Row>
-
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Weather: {weather.description}. {weatherData.wind?.name}</div>
+                            <h1>{weather.description}. {weatherData.wind?.name}</h1>
                         </Col>
                     </Row>
-
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Wind Speed: {weatherData.wind?.speed} m/s</div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Wind direction: {getWindDirection(weatherData.wind?.deg)}</div>
+                            <div className="Town-main-data">{weatherData.wind?.speed} m/s</div>
+                            <div className="Town-main-label">Wind Speed</div>
                         </Col>
                         <Col className="gutter-row" flex={"auto"}>
-                            <div>Cloud coverage: {weatherData.clouds?.all} %</div>
+                            <div className="Town-main-data">{getWindDirection(weatherData.wind?.deg)}</div>
+                            <div className="Town-main-label">Wind direction</div>
                         </Col>
-
+                        <Col className="gutter-row" flex={"auto"}>
+                            <div className="Town-main-data">{weatherData.clouds?.all}%</div>
+                            <div className="Town-main-label">Cloudiness</div>
+                        </Col>
+                        <Col className="gutter-row" flex={"auto"}>
+                        </Col>
                     </Row>
+                    {/*<Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>*/}
+                    {/*    <Col className="gutter-row" flex={"auto"}>*/}
+                    {/*        <div>Coordinates: {weatherData.coord?.lat} : {weatherData.coord?.lon}</div>*/}
+                    {/*    </Col>*/}
+                    {/*</Row>*/}
                 </div>
             ))}
         </div>

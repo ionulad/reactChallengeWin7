@@ -1,0 +1,12 @@
+.Main-header {
+  text-align: center;
+  font-family: verdana, serif;
+  background-color: #565656;
+  font-size: calc(20px + 2vmin);
+  color: white;
+}
+.Divider {
+  text-align: center;
+  font-size: calc(10px + 2vmin);
+}
+/*# sourceMappingURL=Main.css.map */
