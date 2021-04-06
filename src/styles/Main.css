@@ -1,6 +1,13 @@
 .Main-header {
   text-align: center;
   font-family: verdana, serif;
+  background-color: #828282;
+  font-size: calc(20px + 2vmin);
+  color: white;
+}
+.Main-footer {
+  text-align: center;
+  font-family: verdana, serif;
   background-color: #565656;
   font-size: calc(20px + 2vmin);
   color: white;

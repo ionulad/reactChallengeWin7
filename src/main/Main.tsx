@@ -477,20 +477,7 @@ const Main: () => JSX.Element = () => {
                               addToFavorites={() => addToFavorites(townWeather)}/>
                     )
                 )}
-                <Divider/>
-                {error &&
-                <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
-                    <Col className="gutter-row" flex={"auto"}>
-                        <Alert message="Error" description={error} type="error" showIcon/>
-                    </Col>
-                </Row>}
-            </Content>
-            <Footer>
-                <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
-                    <h1>
-                        Towns loaded: {towns.length}
-                    </h1>
-                </Row>
+
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Button type="primary" onClick={() => loadMoreDataOnButtonClick()}>
                         Load More
@@ -502,6 +489,23 @@ const Main: () => JSX.Element = () => {
                         </button>
                     </Dropdown>
                 </Row>
+                {/*<Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>*/}
+                {/*    <h1>*/}
+                {/*        Towns loaded: {towns.length}*/}
+                {/*    </h1>*/}
+                {/*</Row>*/}
+                {error &&
+                <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
+                    <Col className="gutter-row" flex={"auto"}>
+                        <Alert message="Error" description={error} type="error" showIcon/>
+                    </Col>
+                </Row>}
+
+            </Content>
+            <Footer className="Main-footer">
+                &copy; Ionuț Ștețco
+                <td/>
+                Just having fun learning React &hearts;
             </Footer>
         </Layout>
     );
