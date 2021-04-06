@@ -243,26 +243,20 @@ const Main: () => JSX.Element = () => {
 
     function loadFavoritesData() {
         const cachedFavorites = favoritesCache.getItem<IWeatherData[]>("favorites");
-        cachedFavorites.then((result) => {
+        cachedFavorites.then(async (result) => {
             if (result) {
                 setFavorites([...result]);
                 console.log("loaded favorites data from cache!");
             } else if (favorites.length >= 1) {
                 let newFavorites: IWeatherData[] = [];
-                for (const favorite of favorites) {
-                    if (favorite.id != null) {
-                        let promise = Promise.all([loadDataForCity(favorite.id)]);
-                        promise.then(result => {
-                            result.forEach(element => {
-                                if (element) {
-                                    newFavorites = [...newFavorites, element];
-                                }
-                            })
-                            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
-                            setFavorites(newFavorites);
-                        })
+                (await Promise.all(favorites.map(favorite => loadDataForCity(favorite.id)))).forEach(f => {
+                    if (f) {
+                        newFavorites = [...newFavorites, f];
                     }
-                }
+                });
+
+                favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
+                setFavorites(newFavorites);
             }
         });
     }
