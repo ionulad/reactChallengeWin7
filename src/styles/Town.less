@@ -1,11 +1,23 @@
-@imageBackground: #b9bcbd;
-@mainTextColor: #8c8c8c;
+@imageBackground: #d6d6d6;
+@mainTextColor: #828282;
 .Town {
   text-align: center;
+  border-style: double;
+  background-color: @imageBackground;
+  margin: 2px;
 }
 
 .Town-image {
-  background-color: @imageBackground;
+  border-radius: 40px;
+}
+
+.Town-temperature {
+  text-align: center;
+  color: @mainTextColor;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-family: Apple, serif;
+  font-size: xxx-large;
 }
 
 .Town-title {
@@ -20,8 +32,10 @@
   color: @mainTextColor;
   font-family: Apple, serif;
   font-size: x-large;
+  text-transform: capitalize
 }
 
 .Town-main-label {
-
+  font-family: Apple, serif;
+  font-size: large;
 }

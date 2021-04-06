@@ -1,8 +1,19 @@
 .Town {
   text-align: center;
+  border-style: double;
+  background-color: #d6d6d6;
+  margin: 2px;
 }
 .Town-image {
-  background-color: #b9bcbd;
+  border-radius: 40px;
+}
+.Town-temperature {
+  text-align: center;
+  color: #828282;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-family: Apple, serif;
+  font-size: xxx-large;
 }
 .Town-title {
   text-align: center;
@@ -11,8 +22,13 @@
   text-align: center;
 }
 .Town-main-data {
-  color: #8c8c8c;
+  color: #828282;
   font-family: Apple, serif;
   font-size: x-large;
+  text-transform: capitalize;
+}
+.Town-main-label {
+  font-family: Apple, serif;
+  font-size: large;
 }
 /*# sourceMappingURL=Town.css.map */

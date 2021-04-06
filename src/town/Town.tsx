@@ -55,6 +55,12 @@ export function convertKelvinToCelsius(kelvinDegrees: number | undefined) {
     return celsiusDegrees.toPrecision(2);
 }
 
+export function capitalizeFirstLetter(parameter: string | undefined) {
+    if (parameter) {
+        return parameter.charAt(0).toUpperCase() + parameter.slice(1);
+    }
+}
+
 export function getWindDirection(d: number | undefined) {
     if (!d) {
         return "no direction"
@@ -105,31 +111,25 @@ export const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (w
     return (
         <div className="Town">
             <Divider className="Town-title" orientation="center">
-                {weatherData.name}&nbsp;
-                <StarTwoTone twoToneColor="#b0290b" onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
+                <h3>{weatherData.name}&nbsp;
+                    <StarTwoTone twoToneColor="#b0290b" onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
+                </h3>
             </Divider>
             {weatherData.weather.map((weather) => (
                 <div className="Town-body" key={weather.id}>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
-                        <Col className="gutter-row" flex={"auto"}>
-                        </Col>
-                        <Col className="gutter-row" flex={"auto"}>
-                        </Col>
-                        <Col className="gutter-row" flex={"auto"}>
-                            <div>
-                                <Image className="Town-image"
-                                       src={'http://openweathermap.org/img/wn/' + weather.icon + '@2x.png'}/>
-                            </div>
-                            <div><h1>{convertKelvinToCelsius(weatherData.main?.temp)}&#8451;</h1></div>
-                        </Col>
-                        <Col className="gutter-row" flex={"auto"}>
-                        </Col>
-                        <Col className="gutter-row" flex={"auto"}>
-                        </Col>
+                        <div>
+                            <Image className="Town-image"
+                                   src={'http://openweathermap.org/img/wn/' + weather.icon + '@2x.png'}/>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div className="Town-temperature">
+                            {convertKelvinToCelsius(weatherData.main?.temp)}&#8451;
+                        </div>
                     </Row>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                         <Col className="gutter-row" flex={"auto"}>
-                            <h1>{weather.description}. {weatherData.wind?.name}</h1>
+                            <h1>{capitalizeFirstLetter(weather.description)} {capitalizeFirstLetter(weatherData.wind?.name)}</h1>
                         </Col>
                     </Row>
                     <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
