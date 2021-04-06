@@ -48,7 +48,7 @@ interface IWeatherData {
     dt?: number
     sys?: ISystem;
     timezone?: number
-    id?: number;
+    id: number;
     name?: string;
     cod?: number;
 }
