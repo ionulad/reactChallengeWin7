@@ -474,11 +474,16 @@ const Main: () => JSX.Element = () => {
             <Content>
                 {favorites.length > 0 &&
                 <Divider className={"Divider"} dashed={true}><h1>Favorites</h1></Divider>}
-                {favorites.map((weatherFavorite) => (
-                        <Town key={weatherFavorite.id} weatherData={weatherFavorite}
-                              addToFavorites={() => removeFromFavorites(weatherFavorite)}/>
-                    )
-                )}
+                <Row className="Main-row" justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
+                    {favorites.map((weatherFavorite) => (
+                            <Col className="gutter-row" key={weatherFavorite.id}>
+                                <Town weatherData={weatherFavorite}
+                                      addToFavorites={() => removeFromFavorites(weatherFavorite)}/>
+                            </Col>
+                        )
+                    )}
+                </Row>
+
                 <Divider className={"Divider"} dashed={true}><h1>Towns</h1></Divider>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Dropdown overlay={menu}>
@@ -487,12 +492,15 @@ const Main: () => JSX.Element = () => {
                         </button>
                     </Dropdown>
                 </Row>
-                {towns.map((townWeather) => (
-                        <Town key={townWeather.id} weatherData={townWeather}
-                              addToFavorites={() => addToFavorites(townWeather)}/>
-                    )
-                )}
-
+                <Row className="Main-row" justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
+                    {towns.map((townWeather) => (
+                            <Col className="gutter-row" key={townWeather.id}>
+                                <Town weatherData={townWeather}
+                                      addToFavorites={() => addToFavorites(townWeather)}/>
+                            </Col>
+                        )
+                    )}
+                </Row>
                 <Row justify={"center"} gutter={{xs: 2, sm: 4, md: 6, lg: 8, xl: 10}}>
                     <Button type="primary" onClick={() => loadMoreDataOnButtonClick()}>
                         Load More

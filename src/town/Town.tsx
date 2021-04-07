@@ -112,7 +112,8 @@ export const Town: (weatherDataWrapper: IWeatherDataWrapper) => JSX.Element = (w
         <div className="Town">
             <Divider className="Town-title" orientation="center">
                 <h3>{weatherData.name}&nbsp;
-                    <StarTwoTone twoToneColor="#b0290b" onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
+                    <StarTwoTone twoToneColor="#b0290b"
+                                 onClick={() => weatherDataWrapper.addToFavorites(weatherData)}/>
                 </h3>
             </Divider>
             {weatherData.weather.map((weather) => (
