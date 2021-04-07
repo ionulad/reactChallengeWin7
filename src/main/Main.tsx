@@ -201,6 +201,9 @@ const Main: () => JSX.Element = () => {
     const [moveLat, setMoveLat] = React.useState(lat);
     const [moveLon, setMoveLon] = React.useState(lon);
 
+    const [latSign, setLatSign] = React.useState(1);
+    const [lonSign, setLonSign] = React.useState(1);
+
     const [quantity] = React.useState(50);
 
     const [favorites, setFavorites] = React.useState(() => {
@@ -232,7 +235,7 @@ const Main: () => JSX.Element = () => {
                 newTowns = [...newTowns, value];
             }
         });
-        townCache.setItem("towns", newTowns, {ttl: 6 * 60}).then(() => console.log("cached data!"));
+        townCache.setItem("towns", newTowns, {ttl: 60 * 60 * 6}).then(() => console.log("cached data!"));
         setTowns(newTowns);
     }
 
@@ -255,7 +258,7 @@ const Main: () => JSX.Element = () => {
                     }
                 });
 
-                favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
+                favoritesCache.setItem("favorites", newFavorites, {ttl: 60 * 30}).then(() => console.log("cached favorites data!"));
                 setFavorites(newFavorites);
             }
         });
@@ -270,6 +273,11 @@ const Main: () => JSX.Element = () => {
                 console.log("loaded data from cache!")
             } else {
                 loadMoreData(lat, lon, quantity);
+                // reset location for load more entries
+                setMoveLat(lat);
+                setMoveLon(lon);
+                setLatSign(1);
+                setLonSign(1);
             }
         });
     }
@@ -327,8 +335,15 @@ const Main: () => JSX.Element = () => {
     }
 
     function loadMoreDataOnButtonClick() {
-        setMoveLat(moveLat + 1);
-        setMoveLon(moveLon + 1)
+        // trying not to get our coordinates out of bounds while we move around the globe aimlessly
+        if (moveLat + latSign > 90 || moveLat + latSign < -90) {
+            setLatSign(latSign * -1);
+        }
+        if (moveLon + lonSign > 180 || moveLon + lonSign < -180) {
+            setLonSign(lonSign * -1);
+        }
+        setMoveLat(moveLat + latSign);
+        setMoveLon(moveLon + lonSign)
         loadMoreData(moveLat, moveLon, quantity);
     }
 
@@ -408,7 +423,7 @@ const Main: () => JSX.Element = () => {
         if (!favorites.find(x => x.id === data.id)) {
             let newFavorites: IWeatherData[] = [...favorites, data];
             localStorage.setItem("favorites", JSON.stringify(newFavorites));
-            favoritesCache.setItem("favorites", newFavorites, {ttl: 30}).then(() => console.log("cached favorites data!"));
+            favoritesCache.setItem("favorites", newFavorites, {ttl: 60 * 30}).then(() => console.log("cached favorites data!"));
             setFavorites(newFavorites);
 
             // setTowns([...towns].filter((value) => {
@@ -423,7 +438,7 @@ const Main: () => JSX.Element = () => {
                 return value.id !== data.id;
             });
             localStorage.setItem("favorites", JSON.stringify(filtered ? filtered : defaultFavorite));
-            favoritesCache.setItem("favorites", filtered, {ttl: 30}).then(() => console.log("cached favorites data!"));
+            favoritesCache.setItem("favorites", filtered, {ttl: 60 * 30}).then(() => console.log("cached favorites data!"));
             setFavorites(filtered);
 
             // setTowns(towns => [...towns, data]);
