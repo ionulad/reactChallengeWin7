@@ -273,7 +273,7 @@ const Main: () => JSX.Element = () => {
                 console.log("loaded data from cache!")
             } else {
                 loadMoreData(lat, lon, quantity);
-                // reset location for load more entries
+                // reset starting point for the load more entries method
                 setMoveLat(lat);
                 setMoveLon(lon);
                 setLatSign(1);
