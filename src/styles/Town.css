@@ -1,7 +1,8 @@
 .Town {
   text-align: center;
   border-style: double;
-  border-radius: 5px;
+  padding: 16px;
+  border-radius: 10px;
   background-color: #729c7d;
   margin: 2px;
   width: 350px;
