@@ -2,7 +2,7 @@
   text-align: center;
   border-style: double;
   border-radius: 5px;
-  background-color: #d6d6d6;
+  background-color: #729c7d;
   margin: 2px;
 }
 .Town-image {
@@ -10,7 +10,7 @@
 }
 .Town-temperature {
   text-align: center;
-  color: #828282;
+  color: #ffffff;
   margin-top: auto;
   margin-bottom: auto;
   font-family: Apple, serif;
@@ -23,7 +23,7 @@
   text-align: center;
 }
 .Town-main-data {
-  color: #828282;
+  color: #ffffff;
   font-family: Apple, serif;
   font-size: x-large;
   text-transform: capitalize;

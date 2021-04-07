@@ -466,7 +466,7 @@ const Main: () => JSX.Element = () => {
         </Menu>
     );
 
-    const headingStyle = {color: "white"};
+    const headingStyle = {color: "white", backgroundColor: "#516b58"};
 
     return (
         <Layout>
