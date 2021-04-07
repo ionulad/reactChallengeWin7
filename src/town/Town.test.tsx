@@ -1,4 +1,4 @@
-import {getWindDirection} from './Town';
+import {capitalizeFirstLetter, convertKelvinToCelsius, getWindDirection} from './Town';
 
 
 describe('Testing Town class methods :', () => {
@@ -20,6 +20,18 @@ describe('Testing Town class methods :', () => {
     describe('getting West wind direction', () => {
         it('properly get the W wind direction', () => {
             expect(getWindDirection(280)).toBe("W");
+        });
+    });
+
+    describe('getting uppercase first letter', () => {
+        it('properly returns the string with the first letter as uppercase', () => {
+            expect(capitalizeFirstLetter("really Strong Wind")).toBe("Really Strong Wind");
+        });
+    });
+
+    describe('getting Celsius degrees from Kelvin', () => {
+        it('properly returns rounded Celsius degrees', () => {
+            expect(convertKelvinToCelsius(280)).toBe("6.9");
         });
     });
 });
