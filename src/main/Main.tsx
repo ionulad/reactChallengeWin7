@@ -213,11 +213,6 @@ const Main: () => JSX.Element = () => {
 
     const [towns, setTowns] = React.useState(defaultFavorite);
 
-    const [loading, setLoading]: [
-        boolean,
-        (loading: boolean) => void
-    ] = React.useState<boolean>(true);
-
     const [error, setError]: [string, (error: string) => void] = React.useState(
         ''
     );
@@ -292,7 +287,6 @@ const Main: () => JSX.Element = () => {
                 timeout: 5000,
             })
             .then((response) => {
-                setLoading(false);
                 return response.data;
             })
             .catch((ex) => {
@@ -304,7 +298,6 @@ const Main: () => JSX.Element = () => {
                             ? 'No Data found for this city'
                             : ex.response.data.message;
                 setError(err);
-                setLoading(false);
             });
     }
 
@@ -319,7 +312,6 @@ const Main: () => JSX.Element = () => {
             })
             .then((response) => {
                 addMoreDataToTownsList(response.data);
-                setLoading(false);
             })
             .catch((ex) => {
                 const err = axios.isCancel(ex)
@@ -330,7 +322,6 @@ const Main: () => JSX.Element = () => {
                             ? 'No Data found with these coordinates'
                             : ex.response.data.message;
                 setError(err);
-                setLoading(false);
             });
     }
 
@@ -466,7 +457,7 @@ const Main: () => JSX.Element = () => {
         </Menu>
     );
 
-    const headingStyle = {color: "white", backgroundColor: "#516b58"};
+    const headingStyle = {color: "white", backgroundColor: "#516b58", height: "75px"};
 
     return (
         <Layout>
