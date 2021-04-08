@@ -427,6 +427,7 @@ const Main: () => JSX.Element = () => {
         if (!favorites.find(x => x.id === data.id)) {
             let newFavorites: IWeatherData[] = [...favorites, data];
             localStorage.setItem("favorites", JSON.stringify(newFavorites));
+            // wish this cache had a getRemainingTTL method.....
             favoritesCache.setItem("favorites", newFavorites, {ttl: 60 * 30}).then(() => console.log("cached favorites data!"));
             setFavorites(newFavorites);
 
