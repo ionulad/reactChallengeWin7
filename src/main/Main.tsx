@@ -201,8 +201,8 @@ const Main: () => JSX.Element = () => {
     const [moveLat, setMoveLat] = React.useState(lat);
     const [moveLon, setMoveLon] = React.useState(lon);
 
-    const [latSign, setLatSign] = React.useState(1);
-    const [lonSign, setLonSign] = React.useState(1);
+    const [latStep, setLatStep] = React.useState(1);
+    const [lonStep, setLonStep] = React.useState(1);
 
     const [quantity] = React.useState(50);
 
@@ -271,8 +271,8 @@ const Main: () => JSX.Element = () => {
                 // reset starting point for the load more entries method
                 setMoveLat(lat);
                 setMoveLon(lon);
-                setLatSign(1);
-                setLonSign(1);
+                setLatStep(1);
+                setLonStep(1);
             }
         });
     }
@@ -326,16 +326,29 @@ const Main: () => JSX.Element = () => {
     }
 
     function loadMoreDataOnButtonClick() {
+        // whoops gotta work around that async
+        let lat = moveLat;
+        let lon = moveLon;
+        let stepLat = latStep;
+        let stepLon = lonStep;
+
         // trying not to get our coordinates out of bounds while we move around the globe aimlessly
-        if (moveLat + latSign > 90 || moveLat + latSign < -90) {
-            setLatSign(latSign * -1);
+        if (lat + stepLat > 90 || lon + stepLat < -90) {
+            stepLat = stepLat * -1;
         }
-        if (moveLon + lonSign > 180 || moveLon + lonSign < -180) {
-            setLonSign(lonSign * -1);
+        if (lon + stepLon > 180 || moveLon + lon < -180) {
+            stepLon = stepLon * -1
         }
-        setMoveLat(moveLat + latSign);
-        setMoveLon(moveLon + lonSign)
-        loadMoreData(moveLat, moveLon, quantity);
+
+        lat = lat + stepLat;
+        lon = lon + stepLon;
+        loadMoreData(lat, lon, quantity);
+
+        // update those globals
+        setMoveLat(lat);
+        setMoveLon(lon)
+        setLatStep(stepLat);
+        setLonStep(stepLon);
     }
 
     function sortByLeastWindyTowns() {
