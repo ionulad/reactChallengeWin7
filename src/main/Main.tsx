@@ -520,7 +520,7 @@ const Main: () => JSX.Element = () => {
             </Content>
             <Footer className="Main-footer">
                 &copy; Ionuț Ștețco
-                <td/>
+                <br/>
                 Just having fun learning React &hearts;
             </Footer>
         </Layout>
