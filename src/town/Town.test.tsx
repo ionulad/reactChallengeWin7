@@ -7,6 +7,17 @@ describe('Testing Town class methods :', () => {
             expect(getWindDirection(350)).toBe("N");
         });
     });
+    describe('getting North wind direction if inputting 0', () => {
+        it('properly get the N wind direction', () => {
+            expect(getWindDirection(0)).toBe("N");
+        });
+    });
+    describe('getting North wind direction by default', () => {
+        it('properly get the N wind direction', () => {
+            expect(getWindDirection(undefined)).toBe("N");
+        });
+    });
+
     describe('getting South wind direction', () => {
         it('properly get the s wind direction', () => {
             expect(getWindDirection(180)).toBe("S");

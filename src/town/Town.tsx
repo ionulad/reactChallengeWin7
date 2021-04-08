@@ -63,7 +63,8 @@ export function capitalizeFirstLetter(parameter: string | undefined) {
 
 export function getWindDirection(d: number | undefined) {
     if (!d) {
-        return "no direction"
+        // defaulting to North
+        return "N"
     }
     if (d > 348.75 || d < 11.25)
         return "N";
